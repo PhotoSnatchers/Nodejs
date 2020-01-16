@@ -32,7 +32,7 @@ app.post('/api/login',(req, res) => {
     if(err) throw err;
     if (results.length > 0) {
       if(data.password == results[0].password){
-        res.send(JSON.stringify({"status": 200, "error": null, "response": "login success"}));
+        res.send(JSON.stringify({"status": 200, "error": null, "email": data.email,  "response": "login success"}));
       } else {
         res.send(JSON.stringify({"status": 200, "error": null, "response": "Email / Password Doesn't Exists"}));
       } 
@@ -44,7 +44,6 @@ app.post('/api/login',(req, res) => {
 
 app.post('/api/registration',(req, res) => {
     let data = {user_name: req.body.name, email: req.body.email, password: req.body.password};
-    // let sqlquery = "select * from registration where email= ?";
     let q = conn.query("SELECT * FROM registration WHERE email = ?",[data.email], function(err, rows) {
       if(err) throw err;
       if (rows.length) {
@@ -58,7 +57,7 @@ app.post('/api/registration',(req, res) => {
     });
   });
 
-//show all products
+//show all users
 app.get('/api',(req, res) => {
   let sql = "SELECT * FROM registration";
   let query = conn.query(sql, (err, results) => {
