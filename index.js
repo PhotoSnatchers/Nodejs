@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const conn = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: 'root',
   database: 'application'
 });
  
@@ -26,12 +26,35 @@ app.use(function(req, res, next) {
   next();
 });
  
+app.post('/api/login',(req, res) => {
+  let data = {email: req.body.email, password: req.body.password};
+  let q = conn.query("SELECT * FROM registration WHERE email = ?",[data.email], function(err, results) {
+    if(err) throw err;
+    if (results.length > 0) {
+      if(data.password == results[0].password){
+        res.send(JSON.stringify({"status": 200, "error": null, "response": "login success"}));
+      } else {
+        res.send(JSON.stringify({"status": 200, "error": null, "response": "Email / Password Doesn't Exists"}));
+      } 
+    }  else {
+      res.send(JSON.stringify({"status": 200, "error": null, "response": "Email / Password Doesn't Exists"}));
+    }   
+  });
+});
+
 app.post('/api/registration',(req, res) => {
-    let data = {name: req.body.name, email: req.body.email, password: req.body.password};
-    let sql = "INSERT INTO registration SET ?";
-    let query = conn.query(sql, data,(err, results) => {
+    let data = {user_name: req.body.name, email: req.body.email, password: req.body.password};
+    // let sqlquery = "select * from registration where email= ?";
+    let q = conn.query("SELECT * FROM registration WHERE email = ?",[data.email], function(err, rows) {
       if(err) throw err;
-      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+      if (rows.length) {
+        res.send(JSON.stringify({"status": 200, "error": null, "response": "Email Exists"}));
+    } else {
+      let sql = "INSERT INTO registration SET ?";
+      let query = conn.query(sql, data,(err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": "Successfully Registered"}));
+    });}
     });
   });
 
