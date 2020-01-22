@@ -25,7 +25,7 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
- 
+// login
 app.post('/api/login',(req, res) => {
   let data = {email: req.body.email, password: req.body.password};
   let q = conn.query("SELECT * FROM registration WHERE email = ?",[data.email], function(err, results) {
@@ -41,7 +41,7 @@ app.post('/api/login',(req, res) => {
     }   
   });
 });
-
+// registration
 app.post('/api/registration',(req, res) => {
     let data = {user_name: req.body.name, email: req.body.email, password: req.body.password};
     let q = conn.query("SELECT * FROM registration WHERE email = ?",[data.email], function(err, rows) {
@@ -55,6 +55,18 @@ app.post('/api/registration',(req, res) => {
       res.send(JSON.stringify({"status": 200, "error": null, "response": "Successfully Registered"}));
     });}
     });
+  });
+// change password
+  app.put('/api/forgetpwd',(req, res) => {
+  let data = {email: req.body.email,password: req.body.password};
+      let query = conn.query('UPDATE `registration` SET `password` = ? WHERE `email` = ?',[data.password,data.email], function(err, result) {
+        if (err) throw err;
+        if(result.affectedRows > 0) {
+        res.send(JSON.stringify({"status": 200, "error": null, "response": "Password changed"}));
+        } else {
+        res.send(JSON.stringify({"status": 200, "error": null, "response": "Email Not Found"})); 
+        }
+      }); 
   });
 
 //show all users
